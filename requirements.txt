@@ -9,5 +9,6 @@ sentence-transformers
 transformers
 torch
 streamlit
+pydantic
 python-dotenv
 protobuf==3.20.0
