@@ -1,5 +1,5 @@
 import os
-os.environ["CHROMA_TELEMETRY"] = "false"  # silence telemetry noise
+os.environ["CHROMA_TELEMETRY"] = "false"
 
 from modules.embeddings import get_embeddings
 
