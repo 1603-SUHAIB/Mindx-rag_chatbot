@@ -2,20 +2,24 @@ import os
 
 def get_llm():
     """
-    Returns a LangChain LLM based on environment variables.
-    If a GOOGLE_API_KEY is present, it will be used exclusively.
-    Otherwise, it will fall back to OpenAI, and finally a local model.
+    Returns a LangChain LLM based on hardcoded or environment variables.
+    Priority: Google Gemini -> OpenAI -> Local HuggingFace.
     """
-    if os.getenv("GOOGLE_API_KEY"):
+    GOOGLE_API_KEY = "AIzaSyDg6ZKd9MZKXbLqlJGr2hwYrDIDJOgZ4cE"
+
+    if GOOGLE_API_KEY:
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
             print("✅ Attempting to use Google Gemini model...")
-            
-            if "your-google-api-key" in os.getenv("GOOGLE_API_KEY"):
-                 print("❌ The GOOGLE_API_KEY in your .env file is still a placeholder. Please add your real key.")
-                 return None
 
-            llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
+            if GOOGLE_API_KEY.strip() == "" or "your-google-api-key" in GOOGLE_API_KEY:
+                print("❌ The GOOGLE_API_KEY is invalid. Please add your real key.")
+                return None
+
+            llm = ChatGoogleGenerativeAI(
+                model="gemini-1.5-flash",
+                google_api_key=GOOGLE_API_KEY
+            )
             print("✅ Google Gemini model loaded successfully.")
             return llm
         except ImportError:
@@ -23,7 +27,6 @@ def get_llm():
             return None
         except Exception as e:
             print(f"❌ An error occurred while initializing Google Gemini: {e}")
-            print("   Please ensure your Google API key in the .env file is correct and has the 'Generative Language API' enabled in your Google Cloud project.")
             return None
 
     if os.getenv("OPENAI_API_KEY"):
@@ -34,7 +37,7 @@ def get_llm():
         except Exception as e:
             print(f"❌ Error initializing OpenAI: {e}")
             return None
-            
+
     print("✅ No API key found. Using local HuggingFace model as a fallback.")
     from transformers import pipeline
     from langchain_huggingface import HuggingFacePipeline
@@ -48,4 +51,3 @@ def get_llm():
     except Exception as e:
         print(f"❌ Failed to load local model: {e}")
         return None
-
